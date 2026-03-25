@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.database import get_mysql_connection
-from app.schemas import PacienteCreate, PacienteUpdate, PacienteResponse
+from app.schemas import PacienteCreate, PacienteUpdate, PacienteResponse, ConsultaCreate, ConsultaResponse
 from typing import List
 
 router = APIRouter()
@@ -96,6 +96,39 @@ def patch_paciente(id: int, paciente: PacienteUpdate):
             cursor.execute(sql, (*fields.values(), id))
             conn.commit()
             cursor.execute("SELECT * FROM pacientes WHERE id_paciente = %s", (id,))
+            return cursor.fetchone()
+    finally:
+        conn.close()
+        
+        
+
+# metodo GET para obtener todas las consultas
+@router.get("/consultas", response_model=List[ConsultaResponse])
+def get_consultas():
+    conn = get_mysql_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM consultas")
+            return cursor.fetchall()
+    finally:
+        conn.close()
+
+# metodo POST para crear una consulta
+@router.post("/consultas", response_model=ConsultaResponse)
+def create_consulta(consulta: ConsultaCreate):
+    conn = get_mysql_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = """INSERT INTO consultas 
+                    (id_paciente, fecha_consulta, motivo, diagnostico, tratamiento)
+                    VALUES (%s, %s, %s, %s, %s)"""
+            cursor.execute(sql, (
+                consulta.id_paciente, consulta.fecha_consulta,
+                consulta.motivo, consulta.diagnostico,
+                consulta.tratamiento
+            ))
+            conn.commit()
+            cursor.execute("SELECT * FROM consultas WHERE id_consulta = %s", (cursor.lastrowid,))
             return cursor.fetchone()
     finally:
         conn.close()

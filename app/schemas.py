@@ -29,3 +29,18 @@ class PacienteResponse(BaseModel):
     telefono: str
     correo: str
     id_diagnostico: int
+    
+class ConsultaCreate(BaseModel):
+    id_paciente: int
+    fecha_consulta: date
+    motivo: str
+    diagnostico: str
+    tratamiento: str
+
+class ConsultaResponse(BaseModel):
+    id_consulta: int
+    id_paciente: int
+    fecha_consulta: date
+    motivo: str
+    diagnostico: str
+    tratamiento: str
