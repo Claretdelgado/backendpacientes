@@ -14,6 +14,7 @@ app.add_middleware(
 )
 # se incluyen las rutas en app/routes.py
 app.include_router(router, prefix="/api")
+
 # para ruta raíz para verificar que la API está funcionando
 @app.get("/")
 def root():
